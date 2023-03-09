@@ -9,12 +9,9 @@ Sphere::Sphere(double r, Tuple c) {
     this->radius = r;
     this->center = Tuple(c);
     this->center.turnToPoint();
-    this->setColor(255,255,255);
 }
 
-// return true if ray hits plane which will be the case if the ray was not parallel to the plane and set pass-by-reference argument t to be the distance from the origin to the intersection point.
-// else, return false and set t to -1 to signify the ray missed the plane.
-bool Sphere::rayHitsSphere(const Tuple rayDirection, const Tuple rayOrigin) {
+bool Sphere::rayHitsSphere(const Tuple rayDirection, const Tuple rayOrigin, bool shadowCast) {
     Tuple v = Tuple(rayOrigin);
     v = v - this->center;
     double a = rayDirection.dot(rayDirection);
@@ -26,6 +23,11 @@ bool Sphere::rayHitsSphere(const Tuple rayDirection, const Tuple rayOrigin) {
         this->t += b * -1;
         this->t = this->t / (a*2);
         this->tRear = this->t;
+        if (!shadowCast) {
+            Tuple temp = rayDirection * this->t;
+            temp = temp + rayOrigin;
+            this->setNormal(temp);
+        }
         return true;
     }
     else if (discriminant > 0) { // two intersection points
@@ -46,6 +48,11 @@ bool Sphere::rayHitsSphere(const Tuple rayDirection, const Tuple rayOrigin) {
             this->t = solution2;
             this->tRear = solution1;
         }
+        if (!shadowCast) {
+            Tuple temp = rayDirection * this->t;
+            temp = temp + rayOrigin;
+            this->setNormal(temp);
+        }
         return true;
     }
     else { // no intersection points
@@ -56,14 +63,8 @@ bool Sphere::rayHitsSphere(const Tuple rayDirection, const Tuple rayOrigin) {
     return false; // should never get here
 }
 
-//set the color
-void Sphere::setColor(int r, int g, int b) {
-    this->color[0] = r;
-    this->color[1] = g;
-    this->color[2] = b;
+void Sphere::setNormal(Tuple intersectPoint) {
+    this->normal = intersectPoint - this->center;
+    this->normal.normalize();
+    this->currentObjPoint = intersectPoint;
 }
-
-//Let V = (O –C)
-//Let a = D^2 = D dot D
-//Let b = 2VD = 2 * (V dot D)
-//Let c = V^2 –r^2 = (V dot V) - ^2

@@ -16,10 +16,7 @@ Plane(Tuple normalVector, Tuple c);
 // return true if ray hits plane which will be the case if the ray was not parallel to the plane and set pass-by-reference argument t to be the distance from the origin to the intersection point.
 // else, return false and set t to -1 to signify the ray missed the plane.
 // edit: I am now storing t inside the objects themselves. 
-bool rayHitsPlane(const Tuple rayDirection, const Tuple rayOrigin);
-
-//set the color
-void setColor(int r, int g, int b);
+bool rayHitsPlane(const Tuple rayDirection, const Tuple rayOrigin, bool shadowCast);
 
 };
 
